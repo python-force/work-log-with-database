@@ -1,4 +1,4 @@
-# CSV Work Log
+# Database Work Log
 
 You can select from the Main Menu
 
@@ -9,7 +9,7 @@ Welcome to Work Log.
 
 ## AddTask
 
-Will Add record to the CSV
+Will Add record to the Database
 
 ## SeachTask
 
