@@ -4,6 +4,23 @@ from collections import OrderedDict
 import datetime
 from peewee import *
 
+db = SqliteDatabase('catalogue.db')
+
+class Employee(Model):
+    pub_date = DateTimeField(default=datetime.datetime.now)
+    name = CharField(max_length=50)
+    task_name = CharField(max_length=50)
+    time_spent = IntegerField()
+    notes = TextField()
+
+    class Meta:
+        database = db
+
+def initialize():
+    """Create the database and the table if they don't exist."""
+    db.connect()
+    db.create_tables([Employee], safe=True)
+
 def clear_screen():
     """
     Clear screen
@@ -55,7 +72,7 @@ def add_entry():
                     task_notes = input("Enter a notes: ")
                     break
             break
-    
+
 
 def view_entries():
     """View Records"""
@@ -73,6 +90,7 @@ menu = OrderedDict([
 # Script doesn't execute when imported
 if __name__ == '__main__':
     # The script will keep running till the user is satisfied
+    initialize()
     main_menu()
 
     print("Thank you and have a very safe and productive day. "
