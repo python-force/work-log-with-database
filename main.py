@@ -1,6 +1,7 @@
 import time
 import os, sys
 from collections import OrderedDict
+import datetime
 from peewee import *
 
 def clear_screen():
@@ -17,28 +18,56 @@ def main_menu():
     """Main Menu for the App"""
     choice = None
 
-    while choice != 'q':
-        print("Enter 'q' to quit.")
+    while choice != '4':
+        clear_screen()
         for key, value in menu.items():
-            print('{}) {}'.format(key, value.__doc__))
-        choice = input('Action: ').lower().strip()
+            if value == "Exit":
+                print('{}) {}'.format(key, value))
+            else:
+                print('{}) {}'.format(key, value.__doc__))
+        choice = input('What would you like to do?: ').lower().strip()
 
-        if choice in menu:
+        if choice in menu and choice != "4":
             menu[choice]()
 
 def add_entry():
-    """Hello Dude"""
+    """Add a new record"""
+    clear_screen()
+    while True:
+        task_date = input("Enter a date: ")
+        try:
+            datetime.datetime.strptime(task_date, '%Y/%m/%d')
+        except ValueError:
+            print("Date you specified is not valid, please try again.")
+            continue
+        else:
+            task_title = input("Enter a title: ")
+            while True:
+                try:
+                    task_time_spent = int(input("Enter time spent: "))
+                except ValueError:
+                    print("Your selection is not a number, please try again: ")
+                    continue
+                if task_time_spent < 0:
+                    print("Sorry, your response must not be negative.")
+                    continue
+                else:
+                    task_notes = input("Enter a notes: ")
+                    break
+            break
+    
 
 def view_entries():
-    """Hello Dude"""
+    """View Records"""
 
 def search_entries():
-    """Hello Dude"""
+    """Search Records"""
 
 menu = OrderedDict([
     ('1', add_entry),
     ('2', view_entries),
     ('3', search_entries),
+    ('4', "Exit"),
 ])
 
 # Script doesn't execute when imported
