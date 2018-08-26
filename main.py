@@ -56,7 +56,7 @@ def search_main_menu():
     while choice != '6':
         clear_screen()
         for key, value in search_menu.items():
-            if value == "Exit":
+            if value == "Go to Main Menu":
                 print('{}) {}'.format(key, value))
             else:
                 print('{}) {}'.format(key, value.__doc__))
@@ -66,10 +66,7 @@ def search_main_menu():
             search_menu[choice]()
 
 def search_by_date():
-    """
-    Searching by valid date
-    :return: Route method to show results
-    """
+    """Search by Date"""
     while True:
         try:
             search_data = input("What date you looking for? "
@@ -87,10 +84,7 @@ def search_by_date():
     view_entries(header, search_data, start_date, end_date)
 
 def search_by_date_range():
-    """
-    Searching by date range
-    :return: Route method to show results
-    """
+    """Search by Date Range"""
     while True:
         try:
             start_date = input("What is your starting date? "
@@ -110,10 +104,7 @@ def search_by_date_range():
     view_entries(header, search_data, start_date, end_date)
 
 def search_by_time_spent():
-    """
-    Searching by valid time spent
-    :return: Route method to show results
-    """
+    """Search by Time Spent"""
     while True:
         try:
             search_data = int(input("What time you looking for?: "))
@@ -130,10 +121,7 @@ def search_by_time_spent():
     view_entries(header, search_data, start_date, end_date)
 
 def search_by_term():
-    """
-    Searching by regex to find exact match
-    :return: Route method to show results
-    """
+    """Search by Term (Title, Notes)"""
     search_data = input("Enter a string you looking for: ")
     search_data = r'\b{0}\b'.format(search_data)
     header = ["Notes"]
@@ -142,10 +130,7 @@ def search_by_term():
     view_entries(header, search_data, start_date, end_date)
 
 def search_by_name():
-    """
-    Searching by regex to find exact match
-    :return: Route method to show results
-    """
+    """Search by Name"""
     search_data = input("Enter a string you looking for: ")
     search_data = r'\b{0}\b'.format(search_data)
     header = ["Name"]
@@ -180,11 +165,11 @@ def view_entries(header, search_data, start_date, end_date):
         all_records = Employee.select()
         found = []
         for record in all_records:
-            found_record = re.search(search_data, record.task_name)
+            found_record = re.search(search_data, record.task_name, re.I)
             if found_record:
                 found.append(record)
             else:
-                found_record = re.search(search_data, record.notes)
+                found_record = re.search(search_data, record.notes, re.I)
                 if found_record:
                     found.append(record)
         all_records = found
@@ -192,7 +177,7 @@ def view_entries(header, search_data, start_date, end_date):
         all_records = Employee.select()
         found = []
         for record in all_records:
-            found_record = re.match(search_data, record.name)
+            found_record = re.match(search_data, record.name, re.I)
             if found_record:
                 found.append(record)
         all_records = found
@@ -202,16 +187,24 @@ def view_entries(header, search_data, start_date, end_date):
         all_records = Employee.select().where((Employee.pub_date >= start_date) & (Employee.pub_date <= end_date)).order_by(Employee.pub_date.desc())
     else:
         all_records = Employee.select().where(Employee.pub_date == search_data).order_by(Employee.pub_date.desc())
+    step = 1
     for record in all_records:
+        clear_screen()
         print(record.pub_date)
         print(record.name)
         print(record.task_name)
         print(record.time_spent)
         print(record.notes)
-        action = input("[N]ext, "
-                       "[D]elete, "
-                       "[E]dit, "
-                       "[R]eturn to the Menu ")
+        if step == len(all_records):
+            action = input("[D]elete, "
+                           "[E]dit, "
+                           "[R]eturn to the Menu ")
+        else:
+            action = input("[N]ext, "
+                           "[D]elete, "
+                           "[E]dit, "
+                           "[R]eturn to the Menu ")
+            step += 1
         action = action.lower()
         if action == "n":
             clear_screen()
@@ -272,7 +265,7 @@ search_menu = OrderedDict([
     ('3', search_by_time_spent),
     ('4', search_by_name),
     ('5', search_by_term),
-    ('6', "Exit"),
+    ('6', "Go to Main Menu"),
 ])
 
 # Script doesn't execute when imported
