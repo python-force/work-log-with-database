@@ -3,6 +3,7 @@ import os, sys
 from collections import OrderedDict
 import datetime
 from peewee import *
+import re
 
 db = SqliteDatabase('catalogue.db')
 
@@ -104,7 +105,7 @@ def search_by_date_range():
         else:
             break
 
-    header = "pub_date"
+    header = ["pub_date"]
     search_data = ""
     view_entries(header, search_data, start_date, end_date)
 
@@ -123,7 +124,20 @@ def search_by_time_spent():
         else:
             break
 
-    header = "Time Spent"
+    header = ["Time Spent"]
+    start_date = ""
+    end_date = ""
+    view_entries(header, search_data, start_date, end_date)
+
+
+def search_by_exact_match():
+    """
+    Searching by regex to find exact match
+    :return: Route method to show results
+    """
+    search_data = input("Enter a string you looking for: ")
+    search_data = r'\b{0}\b'.format(search_data)
+    header = ["Name"]
     start_date = ""
     end_date = ""
     view_entries(header, search_data, start_date, end_date)
@@ -151,7 +165,15 @@ def add_entry():
 
 def view_entries(header, search_data, start_date, end_date):
     """View Records"""
-    if header == "Time Spent":
+    if header[0] == "Name":
+        all_records = Employee.select()
+        found = []
+        for record in all_records:
+            found_record = re.match(search_data, record.name)
+            if found_record:
+                found.append(record)
+        all_records = found
+    elif header[0] == "Time Spent":
         all_records = Employee.select().where(Employee.time_spent == search_data).order_by(Employee.pub_date.desc())
     elif search_data == "" and start_date != "":
         all_records = Employee.select().where((Employee.pub_date >= start_date) & (Employee.pub_date <= end_date)).order_by(Employee.pub_date.desc())
@@ -225,6 +247,7 @@ search_menu = OrderedDict([
     ('1', search_by_date_range),
     ('2', search_by_date),
     ('3', search_by_time_spent),
+    ('4', search_by_exact_match),
     ('6', "Exit"),
 ])
 
