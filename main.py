@@ -69,9 +69,62 @@ def add_entry():
 
 def view_entries():
     """View Records"""
+    clear_screen()
+    all_records = Employee.select().order_by(Employee.pub_date.desc())
+    for record in all_records:
+        print(record.pub_date)
+        print(record.name)
+        print(record.task_name)
+        print(record.time_spent)
+        print(record.notes)
+        action = input("[N]ext, "
+                       "[D]elete, "
+                       "[E]dit, "
+                       "[R]eturn to the Menu ")
+        action = action.lower()
+        if action == "n":
+            clear_screen()
+            continue
+        elif action == "d":
+            delete(record)
+        elif action == "e":
+            edit_record(record.id)
+        elif action == "r":
+            break
 
 def search_entries():
     """Search Records"""
+
+def delete(record):
+    """Delete Record"""
+    clear_screen()
+    if input("Are you sure you would like to delete " + record.task_name + " ? ").lower() == "y":
+        record.delete_instance()
+
+def edit_record(record_id):
+    """Edit Record"""
+    clear_screen()
+    record = Employee.get(Employee.id==record_id)
+    if input("Are you sure you would like to update " + record.task_name + " ? ").lower() == "y":
+        print("Name is currently set to: " + record.name)
+        record.name = input("Enter the name: ")
+        print("Title is currently set to: " + record.task_name)
+        record.task_name = input("Enter a title: ")
+        while True:
+            try:
+                print("Time Spent is currently set to: " + str(record.time_spent))
+                record.time_spent = int(input("Enter time spent: "))
+            except ValueError:
+                print("Your selection is not a number, please try again: ")
+                continue
+            if record.time_spent < 0:
+                print("Sorry, your response must not be negative.")
+                continue
+            else:
+                print("Notes are currently set to: " + record.notes)
+                record.notes = input("Enter a notes: ")
+                break
+        record.save()
 
 menu = OrderedDict([
     ('1', add_entry),
