@@ -7,7 +7,7 @@ from peewee import *
 db = SqliteDatabase('catalogue.db')
 
 class Employee(Model):
-    pub_date = DateTimeField(default=datetime.datetime.now)
+    pub_date = DateTimeField(default=datetime.datetime.strptime(str(datetime.datetime.now().date()), '%Y-%m-%d'))
     name = CharField(max_length=50)
     task_name = CharField(max_length=50)
     time_spent = IntegerField()
@@ -35,7 +35,7 @@ def main_menu():
     """Main Menu for the App"""
     choice = None
 
-    while choice != '4':
+    while choice != '3':
         clear_screen()
         for key, value in menu.items():
             if value == "Exit":
@@ -44,8 +44,90 @@ def main_menu():
                 print('{}) {}'.format(key, value.__doc__))
         choice = input('What would you like to do?: ').lower().strip()
 
-        if choice in menu and choice != "4":
+        if choice in menu and choice != "3":
             menu[choice]()
+
+
+def search_main_menu():
+    """Search Menu for the App"""
+    choice = None
+
+    while choice != '6':
+        clear_screen()
+        for key, value in search_menu.items():
+            if value == "Exit":
+                print('{}) {}'.format(key, value))
+            else:
+                print('{}) {}'.format(key, value.__doc__))
+        choice = input('What would you like to do?: ').lower().strip()
+
+        if choice in search_menu and choice != "6":
+            search_menu[choice]()
+
+def search_by_date():
+    """
+    Searching by valid date
+    :return: Route method to show results
+    """
+    while True:
+        try:
+            search_data = input("What date you looking for? "
+                                "Format YYYY/MM/DD: ")
+            search_data = datetime.datetime.strptime(search_data, '%Y/%m/%d')
+        except ValueError:
+            print("Date you specified is not valid, please try again.")
+            continue
+        else:
+            break
+
+    header = ["pub_date"]
+    start_date = ""
+    end_date = ""
+    view_entries(header, search_data, start_date, end_date)
+
+def search_by_date_range():
+    """
+    Searching by date range
+    :return: Route method to show results
+    """
+    while True:
+        try:
+            start_date = input("What is your starting date? "
+                               "Format YYYY/MM/DD: ")
+            start_date = datetime.datetime.strptime(start_date, '%Y/%m/%d')
+            end_date = input("What is your ending date? "
+                             "Format YYYY/MM/DD: ")
+            end_date = datetime.datetime.strptime(end_date, '%Y/%m/%d')
+        except ValueError:
+            print("Date you specified is not valid, please try again.")
+            continue
+        else:
+            break
+
+    header = "pub_date"
+    search_data = ""
+    view_entries(header, search_data, start_date, end_date)
+
+def search_by_time_spent():
+    """
+    Searching by valid time spent
+    :return: Route method to show results
+    """
+    while True:
+        try:
+            search_data = int(input("What time you looking for?: "))
+        except ValueError:
+            print("Your selection is not a whole number, "
+                  "please try again: ")
+            continue
+        else:
+            break
+
+    header = "Time Spent"
+    start_date = ""
+    end_date = ""
+    view_entries(header, search_data, start_date, end_date)
+
 
 def add_entry():
     """Add a new record"""
@@ -67,10 +149,14 @@ def add_entry():
     Employee.create(name=employee_name, task_name=task_title, time_spent=task_time_spent, notes=task_notes)
 
 
-def view_entries():
+def view_entries(header, search_data, start_date, end_date):
     """View Records"""
-    clear_screen()
-    all_records = Employee.select().order_by(Employee.pub_date.desc())
+    if header == "Time Spent":
+        all_records = Employee.select().where(Employee.time_spent == search_data).order_by(Employee.pub_date.desc())
+    elif search_data == "" and start_date != "":
+        all_records = Employee.select().where((Employee.pub_date >= start_date) & (Employee.pub_date <= end_date)).order_by(Employee.pub_date.desc())
+    else:
+        all_records = Employee.select().where(Employee.pub_date == search_data).order_by(Employee.pub_date.desc())
     for record in all_records:
         print(record.pub_date)
         print(record.name)
@@ -94,6 +180,9 @@ def view_entries():
 
 def search_entries():
     """Search Records"""
+    clear_screen()
+    search_main_menu()
+
 
 def delete(record):
     """Delete Record"""
@@ -128,9 +217,15 @@ def edit_record(record_id):
 
 menu = OrderedDict([
     ('1', add_entry),
-    ('2', view_entries),
-    ('3', search_entries),
-    ('4', "Exit"),
+    ('2', search_entries),
+    ('3', "Exit"),
+])
+
+search_menu = OrderedDict([
+    ('1', search_by_date_range),
+    ('2', search_by_date),
+    ('3', search_by_time_spent),
+    ('6', "Exit"),
 ])
 
 # Script doesn't execute when imported
