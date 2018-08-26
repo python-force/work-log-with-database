@@ -50,28 +50,21 @@ def main_menu():
 def add_entry():
     """Add a new record"""
     clear_screen()
+    employee_name = input("Enter the name: ")
+    task_title = input("Enter a title: ")
     while True:
-        task_date = input("Enter a date: ")
         try:
-            datetime.datetime.strptime(task_date, '%Y/%m/%d')
+            task_time_spent = int(input("Enter time spent: "))
         except ValueError:
-            print("Date you specified is not valid, please try again.")
+            print("Your selection is not a number, please try again: ")
+            continue
+        if task_time_spent < 0:
+            print("Sorry, your response must not be negative.")
             continue
         else:
-            task_title = input("Enter a title: ")
-            while True:
-                try:
-                    task_time_spent = int(input("Enter time spent: "))
-                except ValueError:
-                    print("Your selection is not a number, please try again: ")
-                    continue
-                if task_time_spent < 0:
-                    print("Sorry, your response must not be negative.")
-                    continue
-                else:
-                    task_notes = input("Enter a notes: ")
-                    break
+            task_notes = input("Enter a notes: ")
             break
+    Employee.create(name=employee_name, task_name=task_title, time_spent=task_time_spent, notes=task_notes)
 
 
 def view_entries():
