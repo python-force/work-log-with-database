@@ -129,8 +129,19 @@ def search_by_time_spent():
     end_date = ""
     view_entries(header, search_data, start_date, end_date)
 
+def search_by_term():
+    """
+    Searching by regex to find exact match
+    :return: Route method to show results
+    """
+    search_data = input("Enter a string you looking for: ")
+    search_data = r'\b{0}\b'.format(search_data)
+    header = ["Notes"]
+    start_date = ""
+    end_date = ""
+    view_entries(header, search_data, start_date, end_date)
 
-def search_by_exact_match():
+def search_by_name():
     """
     Searching by regex to find exact match
     :return: Route method to show results
@@ -165,7 +176,19 @@ def add_entry():
 
 def view_entries(header, search_data, start_date, end_date):
     """View Records"""
-    if header[0] == "Name":
+    if header[0] == "Notes":
+        all_records = Employee.select()
+        found = []
+        for record in all_records:
+            found_record = re.search(search_data, record.task_name)
+            if found_record:
+                found.append(record)
+            else:
+                found_record = re.search(search_data, record.notes)
+                if found_record:
+                    found.append(record)
+        all_records = found
+    elif header[0] == "Name":
         all_records = Employee.select()
         found = []
         for record in all_records:
@@ -247,7 +270,8 @@ search_menu = OrderedDict([
     ('1', search_by_date_range),
     ('2', search_by_date),
     ('3', search_by_time_spent),
-    ('4', search_by_exact_match),
+    ('4', search_by_name),
+    ('5', search_by_term),
     ('6', "Exit"),
 ])
 
