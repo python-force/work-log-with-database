@@ -163,11 +163,16 @@ class WorkLog:
                     found.append(record)
             all_records = found
         elif header[0] == "Time Spent":
-            all_records = Employee.select().where(Employee.time_spent == search_data).order_by(Employee.pub_date.desc())
+            all_records = Employee.select().where(
+                Employee.time_spent == search_data).order_by(Employee.pub_date.desc())
         elif search_data == "" and start_date != "":
-            all_records = Employee.select().where((Employee.pub_date >= start_date) & (Employee.pub_date <= end_date)).order_by(Employee.pub_date.desc())
+            all_records = Employee.select().where(
+                (Employee.pub_date >= start_date) &
+                (Employee.pub_date <= end_date)).order_by(
+                Employee.pub_date.desc())
         else:
-            all_records = Employee.select().where(Employee.pub_date == search_data).order_by(Employee.pub_date.desc())
+            all_records = Employee.select().where(
+                Employee.pub_date == search_data).order_by(Employee.pub_date.desc())
         step = 1
         for record in all_records:
             self.clear_screen()
