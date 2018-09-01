@@ -11,10 +11,7 @@ class WorkLog:
         Clear screen
         :return:
         """
-        if os.system == "nt":
-            os.system('cls')
-        else:
-            os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     def main_menu(self):
         """Main Menu for the App"""
