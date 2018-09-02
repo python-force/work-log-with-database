@@ -1,8 +1,10 @@
-import os, sys
-from collections import OrderedDict
+import os
 import re
 import datetime
-from models import *
+
+from models import Employee
+from collections import OrderedDict
+
 
 class WorkLog:
 
@@ -89,8 +91,7 @@ class WorkLog:
             try:
                 search_data = int(input("What time you looking for?: "))
             except ValueError:
-                print("Your selection is not a whole number, "
-                      "please try again: ")
+                print("Your selection is not a whole number, please try again: ")
                 continue
             else:
                 break
@@ -126,16 +127,19 @@ class WorkLog:
         while True:
             try:
                 task_time_spent = int(input("Enter time spent: "))
+                if task_time_spent < 0:
+                    print("Sorry, your response must not be negative.")
+                    continue
             except ValueError:
                 print("Your selection is not a number, please try again: ")
-                continue
-            if task_time_spent < 0:
-                print("Sorry, your response must not be negative.")
                 continue
             else:
                 task_notes = input("Enter a notes: ")
                 break
-        Employee.create(name=employee_name, task_name=task_title, time_spent=task_time_spent, notes=task_notes)
+        Employee.create(name=employee_name,
+                        task_name=task_title,
+                        time_spent=task_time_spent,
+                        notes=task_notes)
 
     def view_entries(self, header, search_data, start_date, end_date):
         """View Records"""
@@ -223,11 +227,11 @@ class WorkLog:
                 try:
                     print("Time Spent is currently set to: " + str(record.time_spent))
                     record.time_spent = int(input("Enter time spent: "))
+                    if record.time_spent < 0:
+                        print("Sorry, your response must not be negative.")
+                        continue
                 except ValueError:
                     print("Your selection is not a number, please try again: ")
-                    continue
-                if record.time_spent < 0:
-                    print("Sorry, your response must not be negative.")
                     continue
                 else:
                     print("Notes are currently set to: " + record.notes)
