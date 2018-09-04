@@ -141,6 +141,38 @@ class WorkLog:
                         time_spent=task_time_spent,
                         notes=task_notes)
 
+    def name_view_entries(self, all_records, search_data):
+        self.clear_screen()
+        count = 1
+        action = None
+        all_records_dict = {}
+        for record in all_records:
+            all_records_dict[count] = record
+            count += 1
+
+        for key, value in all_records_dict.items():
+            print(str(key) + ". " + value.name)
+
+        while action is None:
+            while True:
+                try:
+                    action = int(input("Please choose which " + (search_data[2:])[:-2] + ":"))
+                    if action < 0:
+                        print("Sorry, your response must not be negative.")
+                        continue
+                    elif action not in all_records_dict.keys():
+                        print("Sorry, that many " + (search_data[2:])[:-2] + "s do not exist, please try again")
+                        continue
+                except ValueError:
+                    print("Your selection is not a whole number, please try again: ")
+                    continue
+                else:
+                    break
+
+        for key, value in all_records_dict.items():
+            if int(key) == int(action):
+                return([value])
+
     def view_entries(self, header, search_data, start_date, end_date):
         """View Records"""
         if header[0] == "Notes":
@@ -163,6 +195,9 @@ class WorkLog:
                 if found_record:
                     found.append(record)
             all_records = found
+            if len(all_records) > 1:
+                all_records = self.name_view_entries(all_records, search_data)
+
         elif header[0] == "Time Spent":
             all_records = Employee.select().where(
                 Employee.time_spent == search_data).order_by(Employee.pub_date.desc())

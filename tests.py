@@ -10,6 +10,11 @@ from classes import WorkLog
 
 class WorkLogTest(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        """Prepare Name DB Testing"""
+        cls.bob_all_records = Employee.select().where(Employee.name.contains("Bob"))
+
     def setUp(self):
         self.work_log = WorkLog()
 
@@ -591,6 +596,33 @@ class WorkLogTest(unittest.TestCase):
                 # Now we need to call the function so everything will run
                 # and the mock object will get triggered
                 self.work_log.view_entries(["pub_date"], "2018-08-29 00:00:00", "", "")
+
+        # The patch view_entry_patch will hold onto whether or not it was
+        # called and with what variables.
+
+        view_entry_patch.assert_called()
+
+
+    def test_name_view_entries(self):
+        """Checks to see if name_view_entries calls the correct method"""
+
+        # Create a user_input variable to hold onto the input statement
+        # we will fake into input()
+
+        user_input = ['1']
+        # The second string never gets called and is ignored in this method
+
+        # We can patch the input() statements by over-riding 'builtins.input'
+        # side_effect can take the list of items we want to put into
+        # the input call
+        with patch('builtins.input', side_effect=user_input):
+            # Here we are patching the view_entries method so it does not
+            # get called.
+            # Notice we need the full path to it with 'classes.'
+            with patch('classes.WorkLog.clear_screen') as view_entry_patch:
+                # Now we need to call the function so everything will run
+                # and the mock object will get triggered
+                self.work_log.name_view_entries(self.bob_all_records, "\\bBob\\b")
 
         # The patch view_entry_patch will hold onto whether or not it was
         # called and with what variables.
